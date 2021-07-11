@@ -17,7 +17,7 @@ export default function Home() {
   });
 
   useEffect(() => {
-    if (!org || !repo) return;
+    if (!data || isLoading) return;
     const queryUrl = encodeURIComponent(
       `${window.location.href}api/${org}/${repo}${!!suffix ? `?suffix=${suffix}` : ""}`
     );
@@ -31,7 +31,7 @@ export default function Home() {
         cacheMinutes * 60
       }&query=count&url=${queryUrl}`
     );
-  }, [org, repo, suffix]);
+  }, [org, repo, suffix, data, isLoading]);
 
   return (
     <div className={styles.container}>
