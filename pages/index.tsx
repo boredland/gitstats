@@ -14,6 +14,8 @@ export default function Home() {
 
   const { data, isLoading } = useQuery(["projects", org, repo], getCount, {
     enabled: !!org && !!repo,
+    retry: false,
+    cacheTime: 10 * 60 * 1000
   });
 
   useEffect(() => {
