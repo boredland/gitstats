@@ -66,5 +66,8 @@ export default async function handler(
     .filter((value) => value !== -Infinity)
     .reduce((pv, cv) => pv + cv, 0);
 
-  res.status(200).json({ count: totalDownloads });
+  res
+    .status(200)
+    .setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate")
+    .json({ count: totalDownloads });
 }
