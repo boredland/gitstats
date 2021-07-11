@@ -2,17 +2,31 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import { useQuery } from "react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [org, setOrg] = useState<string>();
   const [repo, setRepo] = useState<string>();
+  const [badgeUrl, setBadgeUrl] = useState<string>()
 
   const getCount = () => fetch(`/api/${org}/${repo}`).then((res) => res.json());
 
   const { data, isLoading } = useQuery(["projects", org, repo], getCount, {
     enabled: !!org && !!repo,
   });
+
+  
+
+  useEffect(() => {
+    if (!org || !repo) return;
+    const queryUrl = encodeURIComponent(`${window.location.href}api/${org}/${repo}`);
+    const color = encodeURIComponent("green");
+    const label = encodeURIComponent("downloads")
+    const prefix = encodeURIComponent(">=")
+    const cacheMinutes = 60
+
+    setBadgeUrl(`https://img.shields.io/badge/dynamic/json?color=${color}&label=${label}&prefix=${prefix}&cache=${cacheMinutes * 60}&query=count&url=${queryUrl}`);    
+  }, [org, repo])
 
   return (
     <div className={styles.container}>
@@ -50,6 +64,12 @@ export default function Home() {
         <div className={styles.grid}>
           {isLoading && "...loading..."}
           {!isLoading && JSON.stringify(data)}
+        </div>
+        <div className={styles.grid}>
+          {!!badgeUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={badgeUrl} alt="badge"/>
+          )}
         </div>
       </main>
 
