@@ -7,7 +7,8 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const [org, setOrg] = useState<string>();
   const [repo, setRepo] = useState<string>();
-  const [badgeUrl, setBadgeUrl] = useState<string>()
+  const [suffix, setSuffix] = useState<string>();
+  const [badgeUrl, setBadgeUrl] = useState<string>();
 
   const getCount = () => fetch(`/api/${org}/${repo}`).then((res) => res.json());
 
@@ -15,18 +16,22 @@ export default function Home() {
     enabled: !!org && !!repo,
   });
 
-  
-
   useEffect(() => {
     if (!org || !repo) return;
-    const queryUrl = encodeURIComponent(`${window.location.href}api/${org}/${repo}`);
+    const queryUrl = encodeURIComponent(
+      `${window.location.href}api/${org}/${repo}${!!suffix ? `?suffix=${suffix}` : ""}`
+    );
     const color = encodeURIComponent("green");
-    const label = encodeURIComponent("downloads")
-    const prefix = encodeURIComponent(">=")
-    const cacheMinutes = 60
+    const label = encodeURIComponent("downloads");
+    const prefix = encodeURIComponent(">=");
+    const cacheMinutes = 60;
 
-    setBadgeUrl(`https://img.shields.io/badge/dynamic/json?color=${color}&label=${label}&prefix=${prefix}&cache=${cacheMinutes * 60}&query=count&url=${queryUrl}`);    
-  }, [org, repo])
+    setBadgeUrl(
+      `https://img.shields.io/badge/dynamic/json?color=${color}&label=${label}&prefix=${prefix}&cache=${
+        cacheMinutes * 60
+      }&query=count&url=${queryUrl}`
+    );
+  }, [org, repo, suffix]);
 
   return (
     <div className={styles.container}>
@@ -44,11 +49,16 @@ export default function Home() {
           <form
             onSubmit={(
               event: React.FormEvent<HTMLFormElement> & {
-                target: { org: { value: string }; repo: { value: string } };
+                target: {
+                  org: { value: string };
+                  repo: { value: string };
+                  suffix: { value: string };
+                };
               }
             ) => {
               setOrg(event.target.org.value);
               setRepo(event.target.repo.value);
+              setSuffix(event.target.suffix.value);
               event.preventDefault();
             }}
           >
@@ -57,6 +67,9 @@ export default function Home() {
             <br />
             <label htmlFor="repo">github repo: </label>
             <input id="repo" type="text" required />
+            <br />
+            <label htmlFor="suffix">suffix of the files to count (defaults to the file with the highest count): </label>
+            <input id="suffix" type="text" />
             <br />
             <button type="submit">generate</button>
           </form>
@@ -68,7 +81,7 @@ export default function Home() {
         <div className={styles.grid}>
           {!!badgeUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={badgeUrl} alt="badge"/>
+            <img src={badgeUrl} alt="badge" />
           )}
         </div>
       </main>

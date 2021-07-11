@@ -14,6 +14,10 @@ export default async function handler(
   const octokit = new Octokit({ auth: process.env.GITHUB_PAT });
 
   const ownerRepoInput = req.query.repo;
+  let suffixes = req.query.suffix
+  if (typeof suffixes === "string") {
+    suffixes = suffixes.split(",")
+  }
 
   const repoConf = {
     owner: ownerRepoInput[0],
@@ -34,7 +38,6 @@ export default async function handler(
 
   let releaseIds: number[] = [];
   let page = 0;
-  let fetchNext = true;
 
   do {
     const newReleaseIds = (
@@ -47,27 +50,34 @@ export default async function handler(
     page++;
   } while (true);
 
-  console.log(releaseIds);
-
   const downloadsByRelease = await Promise.all(
     releaseIds.map(async (release_id) => {
       const assets = await octokit.repos.listReleaseAssets({
         ...repoConf,
         release_id,
       });
+
+      if (!!suffixes) {
+        const filteredAssets = assets.data.filter(asset => {
+          const nameElements = asset.name.split(".")
+          return suffixes.includes(nameElements[nameElements.length-1])
+        })
+        return filteredAssets
+        .map(asset => asset.download_count)
+        .filter((value) => value !== -Infinity)
+        .reduce((pv, cv) => pv + cv, 0);
+      }
+
       const downloadCounts = assets.data.map((asset) => asset.download_count);
       return Math.max(...downloadCounts);
     })
   );
 
-  console.log(downloadsByRelease);
-
   const totalDownloads = downloadsByRelease
     .filter((value) => value !== -Infinity)
     .reduce((pv, cv) => pv + cv, 0);
 
-  res
-    .status(200)
-    .setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate")
-    .json({ count: totalDownloads });
+  res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate")
+  res.status(200)
+  res.json({ count: totalDownloads });
 }
