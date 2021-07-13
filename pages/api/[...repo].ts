@@ -148,25 +148,26 @@ export default async function handler(
   console.debug("cache-hit", countCache);
 
   if (!countCache || new Date() > countCache.revalidateAfter) {
-    let releaseIds: number[] = [];
+    console.debug("calculating...")
+    let releaseIds = new Set<number>();
     let page = 0;
 
     do {
       const newReleaseIds = (
         await cacheAndRevalidate(
           `${cachePrefix}-release-list-${repoConf.owner}-${repoConf.repo}-p${page}`,
-          octokit.repos.listReleases({ ...repoConf, per_page: 100, page })
+          octokit.repos.listReleases({ ...repoConf, per_page: 30, page })
         )
       ).data.map((release) => release.id);
       if (!newReleaseIds.length) {
         break;
       }
-      releaseIds = [...releaseIds, ...newReleaseIds];
+      newReleaseIds.map(id => releaseIds.add(id))
       page++;
     } while (true);
 
     const downloadsByRelease = await Promise.all(
-      releaseIds.map(async (release_id) => {
+      Array.from(releaseIds).map(async (release_id) => {
         const assets = await cacheAndRevalidate(
           `${cachePrefix}-release_assets-${release_id}`,
           octokit.repos.listReleaseAssets({
@@ -196,8 +197,10 @@ export default async function handler(
       .reduce((pv, cv) => pv + cv, 0);
 
     await saveToCache(cachePrefix + "-total", totalDownloads);
-    return res.json({ count: numberFormat.format(totalDownloads) });
+    console.debug("finished calculating...")
+    res.json({ count: numberFormat.format(totalDownloads) });
+    return;
   }
 
-  return res.json({ count: numberFormat.format(countCache?.value || -Infinity) });
+  res.json({ count: numberFormat.format(countCache?.value || -Infinity) });
 }
