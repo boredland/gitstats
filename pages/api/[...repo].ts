@@ -53,7 +53,7 @@ const cacheInit = () => {
 type CacheElement<T> = {
   key: string;
   value: T;
-  revalidateAfter: Date;
+  revalidateAfter: number;
 };
 
 const getFromCache = async <T>(
@@ -96,7 +96,7 @@ const saveToCache = async <T>(
 
 const cacheAndRevalidate = async <T>(cacheKey: string, queryFn: Promise<T>) => {
   const cacheResult = await getFromCache<T>(cacheKey);
-  if (cacheResult && new Date() <= cacheResult.revalidateAfter) {
+  if (cacheResult && new Date().getTime() <= cacheResult.revalidateAfter) {
     return cacheResult.value;
   }
   const res = await queryFn;
@@ -108,6 +108,8 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const octokit = new Octokit({ auth: process.env.GITHUB_PAT });
+  const now = new Date().getTime()
+  console.debug(now)
 
   await cacheInit();
 
@@ -122,7 +124,7 @@ export default async function handler(
     repo: ownerRepoInput[1],
   };
 
-  const cachePrefix = repoConf.owner + repoConf.repo;
+  const cachePrefix = repoConf.owner + "-" + repoConf.repo;
 
   if (!repoConf.owner || !repoConf.repo) {
     return res
@@ -147,7 +149,7 @@ export default async function handler(
 
   console.debug("cache-hit", countCache);
 
-  if (!countCache || new Date() > countCache.revalidateAfter) {
+  if (!countCache || new Date().getTime() > countCache.revalidateAfter) {
     console.debug("calculating...")
     let releaseIds = new Set<number>();
     let page = 0;
