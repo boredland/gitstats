@@ -7,7 +7,7 @@ import { getFauna } from "../../src/faunaStorage";
 const { Get, Ref, Collection, Query } = faunadb.query;
 
 type Data = {
-  count?: number;
+  count?: string;
   error?: string;
 };
 
@@ -17,6 +17,7 @@ const collectionName = "cache";
 const indexName = `${collectionName}-index`;
 const collectionRef = q.Collection(collectionName);
 const indexRef = q.Index(indexName);
+const numberFormat = new Intl.NumberFormat('en-US')
 
 const randomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -197,8 +198,8 @@ export default async function handler(
       .reduce((pv, cv) => pv + cv, 0);
 
     await saveToCache(cachePrefix + "-total", totalDownloads);
-    return res.json({ count: totalDownloads });
+    return res.json({ count: numberFormat.format(totalDownloads) });
   }
 
-  return res.json({ count: countCache?.value || -Infinity });
+  return res.json({ count: numberFormat.format(countCache?.value || -Infinity) });
 }
