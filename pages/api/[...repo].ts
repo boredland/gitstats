@@ -1,10 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Octokit } from "@octokit/rest";
-import faunadb, { query as q, query } from "faunadb";
+import { query as q } from "faunadb";
 import { getFauna } from "../../src/faunaStorage";
-
-const { Get, Ref, Collection, Query } = faunadb.query;
 
 type Data = {
   count?: string;
