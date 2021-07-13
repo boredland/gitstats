@@ -18,6 +18,10 @@ const indexName = `${collectionName}-index`;
 const collectionRef = q.Collection(collectionName);
 const indexRef = q.Index(indexName);
 
+const randomInt = (min: number, max: number) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
 const cacheInit = () => {
   return Promise.all([
     // init cache collection
@@ -71,7 +75,9 @@ const saveToCache = async <T>(
   const data = {
     key,
     value,
-    revalidateAfter: new Date().setTime(new Date().getTime() + 60 * 60 * 1000),
+    revalidateAfter: new Date().setTime(
+      new Date().getTime() + randomInt(60 * 60 * 1000, 24 * 60 * 60 * 1000)
+    ),
   };
 
   return faunaClient
