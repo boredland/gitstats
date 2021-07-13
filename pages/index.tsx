@@ -29,7 +29,7 @@ export default function Home() {
     const cacheMinutes = 60;
 
     setBadgeUrl(
-      `https://img.shields.io/badge/dynamic/json?color=${color}&label=${label}&prefix=${prefix}&cache=${
+      `https://img.shields.io/badge/dynamic/json?color=${color}&label=${label}&cache=${
         cacheMinutes * 60
       }&query=count&url=${queryUrl}`
     );
