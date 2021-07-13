@@ -10,7 +10,7 @@ export default function Home() {
   const [suffix, setSuffix] = useState<string>();
   const [badgeUrl, setBadgeUrl] = useState<string>();
 
-  const getCount = () => fetch(`/api/${org}/${repo}`).then((res) => res.json());
+  const getCount = () => fetch(`/api/${org}/${repo}${!!suffix ? `?suffix=${suffix}` : ""}`).then((res) => res.json());
 
   const { data, isLoading } = useQuery(["projects", org, repo], getCount, {
     enabled: !!org && !!repo,
