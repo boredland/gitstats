@@ -12,6 +12,7 @@
     "@octokit/auth": "^3.0.3",
     "@octokit/rest": "^18.6.7",
     "@vercel/fetch": "^6.1.1",
+    "faunadb": "^4.3.0",
     "next": "11.0.1",
     "node-fetch": "^2.6.1",
     "react": "17.0.2",
