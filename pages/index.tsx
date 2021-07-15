@@ -25,7 +25,6 @@ export default function Home() {
     );
     const color = encodeURIComponent("green");
     const label = encodeURIComponent("downloads");
-    const prefix = encodeURIComponent(">=");
     const cacheMinutes = 60;
 
     setBadgeUrl(

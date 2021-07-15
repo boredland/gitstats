@@ -15,7 +15,8 @@ const collectionName = "cache";
 const indexName = `${collectionName}-index`;
 const collectionRef = q.Collection(collectionName);
 const indexRef = q.Index(indexName);
-const numberFormat = new Intl.NumberFormat('en-US')
+const numberFormat = new Intl.NumberFormat("en-US");
+const cache = process.env.CACHE !== "false";
 
 const randomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -95,12 +96,77 @@ const saveToCache = async <T>(
 };
 
 const cacheAndRevalidate = async <T>(cacheKey: string, queryFn: Promise<T>) => {
-  const cacheResult = await getFromCache<T>(cacheKey);
+  const cacheResult =
+    cache === true ? await getFromCache<T>(cacheKey) : undefined;
   if (cacheResult && new Date().getTime() <= cacheResult.revalidateAfter) {
     return cacheResult.value;
   }
   const res = await queryFn;
-  return saveToCache(cacheKey, res).then((res) => res.value);
+  if (cache) return saveToCache(cacheKey, res).then((res) => res.value);
+  return res;
+};
+
+const calculateResult = async ({
+  octokit,
+  repoConf,
+  cachePrefix,
+  suffixes
+}: {
+  octokit: Octokit;
+  repoConf: { owner: string; repo: string };
+  cachePrefix: string;
+  suffixes?: string[]
+}) => {
+  console.debug("calculating...");
+  let releaseIds = new Set<number>();
+  let page = 0;
+
+  do {
+    const newReleaseIds = (
+      await cacheAndRevalidate(
+        `${cachePrefix}-release-list-${repoConf.owner}-${repoConf.repo}-p${page}`,
+        octokit.repos.listReleases({ ...repoConf, per_page: 30, page })
+      )
+    ).data.map((release) => release.id);
+    if (!newReleaseIds.length) {
+      break;
+    }
+    newReleaseIds.map((id) => releaseIds.add(id));
+    page++;
+  } while (true);
+
+  const downloadsByRelease = await Promise.all(
+    Array.from(releaseIds).map(async (release_id) => {
+      const assets = await cacheAndRevalidate(
+        `${cachePrefix}-release_assets-${release_id}`,
+        octokit.repos.listReleaseAssets({
+          ...repoConf,
+          release_id,
+        })
+      );
+
+      if (!!suffixes) {
+        const filteredAssets = assets.data.filter((asset) => {
+          const nameElements = asset.name.split(".");
+          return suffixes.includes(nameElements[nameElements.length - 1]);
+        });
+        return filteredAssets
+          .map((asset) => asset.download_count)
+          .filter((value) => value !== -Infinity)
+          .reduce((pv, cv) => pv + cv, 0);
+      }
+
+      const downloadCounts = assets.data.map((asset) => asset.download_count);
+      return Math.max(...downloadCounts);
+    })
+  );
+
+  const totalDownloads = downloadsByRelease
+    .filter((value) => value !== -Infinity)
+    .reduce((pv, cv) => pv + cv, 0);
+
+  console.debug("finished calculating...");
+  return numberFormat.format(totalDownloads);
 };
 
 export default async function handler(
@@ -108,8 +174,8 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const octokit = new Octokit({ auth: process.env.GITHUB_PAT });
-  const now = new Date().getTime()
-  console.debug(now)
+  const now = new Date().getTime();
+  console.debug(now);
 
   await cacheInit();
 
@@ -145,64 +211,15 @@ export default async function handler(
   res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate");
   res.status(200);
 
-  const countCache = await getFromCache<number>(cachePrefix + "-total");
+  const total = await cacheAndRevalidate(
+    cachePrefix + "-total",
+    calculateResult({
+      repoConf,
+      octokit,
+      cachePrefix,
+      suffixes
+    })
+  );
 
-  console.debug("cache-hit", countCache);
-
-  if (!countCache || new Date().getTime() > countCache.revalidateAfter) {
-    console.debug("calculating...")
-    let releaseIds = new Set<number>();
-    let page = 0;
-
-    do {
-      const newReleaseIds = (
-        await cacheAndRevalidate(
-          `${cachePrefix}-release-list-${repoConf.owner}-${repoConf.repo}-p${page}`,
-          octokit.repos.listReleases({ ...repoConf, per_page: 30, page })
-        )
-      ).data.map((release) => release.id);
-      if (!newReleaseIds.length) {
-        break;
-      }
-      newReleaseIds.map(id => releaseIds.add(id))
-      page++;
-    } while (true);
-
-    const downloadsByRelease = await Promise.all(
-      Array.from(releaseIds).map(async (release_id) => {
-        const assets = await cacheAndRevalidate(
-          `${cachePrefix}-release_assets-${release_id}`,
-          octokit.repos.listReleaseAssets({
-            ...repoConf,
-            release_id,
-          })
-        );
-
-        if (!!suffixes) {
-          const filteredAssets = assets.data.filter((asset) => {
-            const nameElements = asset.name.split(".");
-            return suffixes.includes(nameElements[nameElements.length - 1]);
-          });
-          return filteredAssets
-            .map((asset) => asset.download_count)
-            .filter((value) => value !== -Infinity)
-            .reduce((pv, cv) => pv + cv, 0);
-        }
-
-        const downloadCounts = assets.data.map((asset) => asset.download_count);
-        return Math.max(...downloadCounts);
-      })
-    );
-
-    const totalDownloads = downloadsByRelease
-      .filter((value) => value !== -Infinity)
-      .reduce((pv, cv) => pv + cv, 0);
-
-    await saveToCache(cachePrefix + "-total", totalDownloads);
-    console.debug("finished calculating...")
-    res.json({ count: numberFormat.format(totalDownloads) });
-    return;
-  }
-
-  res.json({ count: numberFormat.format(countCache?.value || -Infinity) });
+  res.json({ count: total });
 }
