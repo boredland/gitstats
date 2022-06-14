@@ -1,6 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Octokit } from "@octokit/rest";
+import { Cache, CacheContainer } from 'node-ts-cache'
+import { MemoryStorage } from 'node-ts-cache-storage-memory'
+
+const octoCache = new CacheContainer(new MemoryStorage())
+const resultCache = new CacheContainer(new MemoryStorage())
 
 type Data = {
   count?: string;
@@ -9,24 +14,37 @@ type Data = {
 
 const numberFormat = new Intl.NumberFormat("en-US");
 
+const fetchReleaseIDs = async (octokit: Octokit, args: { owner: string; repo: string; per_page: number; page: number | undefined }) => {
+  const fn = octokit.repos.listReleases;
+  const cacheKey = JSON.stringify(args);
+  const cachedResult = await octoCache.getItem<ReturnType<typeof fn>>(cacheKey);
+  if (cachedResult) return cachedResult;
+
+  const result = octokit.repos.listReleases(args);
+  await octoCache.setItem(cacheKey, result, { ttl: 360 });
+  return result;
+}
+
 const calculateResult = async ({
   octokit,
   repoConf,
-  cachePrefix,
   suffixes,
 }: {
   octokit: Octokit;
   repoConf: { owner: string; repo: string };
-  cachePrefix: string;
   suffixes?: string[];
 }) => {
+  const cacheKey = JSON.stringify({ repoConf, suffixes });
+  const cachedResult = await resultCache.getItem<string>(cacheKey);
+  if (cachedResult) return cachedResult;
+
   console.debug("calculating...");
   let releaseIds = new Set<number>();
   let page = 0;
 
   do {
-    const newReleaseIds = (
-      await octokit.repos.listReleases({ ...repoConf, per_page: 30, page })
+    const newReleaseIds = (await fetchReleaseIDs(octokit, { ...repoConf, per_page: 30, page })
+      
     ).data.map((release) => release.id);
     if (!newReleaseIds.length) {
       break;
@@ -63,7 +81,9 @@ const calculateResult = async ({
     .reduce((pv, cv) => pv + cv, 0);
 
   console.debug("finished calculating...");
-  return numberFormat.format(totalDownloads);
+  const result = numberFormat.format(totalDownloads);
+  await resultCache.setItem(cacheKey, result, { ttl: 360 });
+  return result;
 };
 
 export default async function handler(
@@ -85,8 +105,6 @@ export default async function handler(
     repo: ownerRepoInput[1],
   };
 
-  const cachePrefix = repoConf.owner + "-" + repoConf.repo;
-
   if (!repoConf.owner || !repoConf.repo) {
     return res
       .status(400)
@@ -106,7 +124,6 @@ export default async function handler(
   const total = await calculateResult({
     repoConf,
     octokit,
-    cachePrefix,
     suffixes,
   });
   res.json({ count: total });

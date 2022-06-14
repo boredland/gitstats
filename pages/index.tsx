@@ -5,37 +5,49 @@ import { useQuery } from "react-query";
 import { useEffect, useState } from "react";
 import https from "https";
 
+
+const getCount = async ({
+  org,
+  repo,
+  suffix,
+}: {
+  org: string;
+  repo: string;
+  suffix?: string;
+}) => {
+  const result = await new Promise<string>((resolve) =>
+    https.get(
+      {
+        path: `/api/${org}/${repo}${!!suffix ? `?suffix=${suffix}` : ""}`,
+        headers: { "Content-Type": "application/json" },
+      },
+      (res) => {
+        let body = "";
+
+        res.on("data", (data) => {
+          body += data.toString();
+          console.log(data.toString);
+        });
+
+        res.on("end", () => {
+          resolve(JSON.parse(body));
+        });
+      }
+    )
+  );
+  return result;
+};
+
 export default function Home() {
   const [org, setOrg] = useState<string>();
   const [repo, setRepo] = useState<string>();
   const [suffix, setSuffix] = useState<string>();
   const [badgeUrl, setBadgeUrl] = useState<string>();
 
-  const getCount = async () => {
-    const result = await new Promise<string>((resolve) =>
-      https.get(
-        {
-          path: `/api/${org}/${repo}${!!suffix ? `?suffix=${suffix}` : ""}`,
-          headers: { "Content-Type": "application/json" },
-        },
-        (res) => {
-          let body = "";
-
-          res.on("data", (data) => {
-            body += data.toString();
-            console.log(data.toString);
-          });
-
-          res.on("end", () => {
-            resolve(JSON.parse(body));
-          });
-        }
-      )
-    );
-    return result;
-  };
-
-  const { data, isLoading } = useQuery(["projects", org, repo], getCount, {
+  const { data, isLoading } = useQuery(["projects", org, repo], () => {
+    if (!org || !repo) return '0';
+    return getCount({ org, repo, suffix});
+  }, {
     enabled: !!org && !!repo,
     retry: false,
     cacheTime: 10 * 60 * 1000,
