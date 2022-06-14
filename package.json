@@ -15,8 +15,8 @@
     "faunadb": "4.3.0",
     "next": "11.1.4",
     "node-fetch": "2.6.7",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "react-query": "3.18.1"
   },
   "devDependencies": {
