@@ -3,6 +3,7 @@ import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import { useQuery } from "react-query";
 import { useEffect, useState } from "react";
+import https from "https";
 
 export default function Home() {
   const [org, setOrg] = useState<string>();
@@ -10,18 +11,42 @@ export default function Home() {
   const [suffix, setSuffix] = useState<string>();
   const [badgeUrl, setBadgeUrl] = useState<string>();
 
-  const getCount = () => fetch(`/api/${org}/${repo}${!!suffix ? `?suffix=${suffix}` : ""}`).then((res) => res.json());
+  const getCount = async () => {
+    const result = await new Promise<string>((resolve) =>
+      https.get(
+        {
+          path: `/api/${org}/${repo}${!!suffix ? `?suffix=${suffix}` : ""}`,
+          headers: { "Content-Type": "application/json" },
+        },
+        (res) => {
+          let body = "";
+
+          res.on("data", (data) => {
+            body += data.toString();
+            console.log(data.toString);
+          });
+
+          res.on("end", () => {
+            resolve(JSON.parse(body));
+          });
+        }
+      )
+    );
+    return result;
+  };
 
   const { data, isLoading } = useQuery(["projects", org, repo], getCount, {
     enabled: !!org && !!repo,
     retry: false,
-    cacheTime: 10 * 60 * 1000
+    cacheTime: 10 * 60 * 1000,
   });
 
   useEffect(() => {
     if (!data || isLoading) return;
     const queryUrl = encodeURIComponent(
-      `${window.location.href}api/${org}/${repo}${!!suffix ? `?suffix=${suffix}` : ""}`
+      `${window.location.href}api/${org}/${repo}${
+        !!suffix ? `?suffix=${suffix}` : ""
+      }`
     );
     const color = encodeURIComponent("green");
     const label = encodeURIComponent("downloads");
@@ -69,7 +94,10 @@ export default function Home() {
             <label htmlFor="repo">github repo: </label>
             <input id="repo" type="text" required />
             <br />
-            <label htmlFor="suffix">suffix of the files to count (defaults to the file with the highest count): </label>
+            <label htmlFor="suffix">
+              suffix of the files to count (defaults to the file with the
+              highest count):{" "}
+            </label>
             <input id="suffix" type="text" />
             <br />
             <button type="submit">generate</button>
