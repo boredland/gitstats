@@ -239,7 +239,7 @@
   dependencies:
     "@octokit/types" "^6.0.3"
 
-"@octokit/auth@^3.0.3":
+"@octokit/auth@3.0.3":
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@octokit/auth/-/auth-3.0.3.tgz#05bba1f224be619834768bdbb49f8a76309367d6"
   integrity sha512-Ei3gBBzUZDCKForSq7NisHsodoFnorS8QzP+E2mbN9DhelR7pVuN9WmbzFNUmSevEU4bJgm2WmGytUHlddJV8g==
@@ -342,7 +342,7 @@
     node-fetch "^2.6.1"
     universal-user-agent "^6.0.0"
 
-"@octokit/rest@^18.6.7":
+"@octokit/rest@18.6.7":
   version "18.6.7"
   resolved "https://registry.yarnpkg.com/@octokit/rest/-/rest-18.6.7.tgz#89b8ecd13edd9603f00453640d1fb0b4175d4b31"
   integrity sha512-Kn6WrI2ZvmAztdx+HEaf88RuJn+LK72S8g6OpciE4kbZddAN84fu4fiPGxcEu052WmqKVnA/cnQsbNlrYC6rqQ==
@@ -487,7 +487,7 @@
     async-retry "^1.3.1"
     debug "^3.1.0"
 
-"@vercel/fetch@^6.1.1":
+"@vercel/fetch@6.1.1":
   version "6.1.1"
   resolved "https://registry.yarnpkg.com/@vercel/fetch/-/fetch-6.1.1.tgz#6564bfe9050f871842cf4834bb0117eaafd3915e"
   integrity sha512-nddCkgpA0aVIqOlzh+qVlzDNcQq0cSnqefM+x6SciGI4GCvVZeaZ7WEowgX8I/HwBAq8Uj5Bdnd+r0+sYsJsig==
@@ -1674,7 +1674,7 @@ fastq@^1.6.0:
   dependencies:
     reusify "^1.0.4"
 
-faunadb@^4.3.0:
+faunadb@4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/faunadb/-/faunadb-4.3.0.tgz#7c272b108c4be46eb8e58f9dfa37366adc9e9602"
   integrity sha512-H5ZnInUNLAvrjqDHYXmYX+S55HP8Ib85QbF/UK1fV/bz125unl7J7LbjqKvMGcREYqOvIrpQCaniK1LwAkXHTw==
@@ -3019,7 +3019,7 @@ react-is@^16.8.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-react-query@^3.18.1:
+react-query@3.18.1:
   version "3.18.1"
   resolved "https://registry.yarnpkg.com/react-query/-/react-query-3.18.1.tgz#893b5475a7b4add099e007105317446f7a2cd310"
   integrity sha512-17lv3pQxU9n+cB5acUv0/cxNTjo9q8G+RsedC6Ax4V9D8xEM7Q5xf9xAbCPdEhDrrnzPjTls9fQEABKRSi7OJA==
