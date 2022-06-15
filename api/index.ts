@@ -6,7 +6,7 @@ import { z } from "zod";
 import IoRedis from "ioredis";
 import { IoRedisStorage } from "node-ts-cache-storage-ioredis";
 
-const ioRedisInstance = new IoRedis(process.env.REDIS_URI!);
+const ioRedisInstance = new IoRedis(process.env.REDIS_URL!);
 const octoCache = new CacheContainer(new IoRedisStorage(ioRedisInstance));
 const resultCache = new CacheContainer(new IoRedisStorage(ioRedisInstance));
 
@@ -49,7 +49,7 @@ const calculateResult = async ({
   const cachedResult = await resultCache.getItem<string>(cacheKey);
   if (cachedResult) {
     console.debug("resultCache hit!");
-    return resultCache;
+    return cachedResult;
   }
 
   console.debug("calculating...");
