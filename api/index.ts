@@ -28,7 +28,9 @@ const fetchReleaseIDs = async (
     return cachedResult;
   }
 
-  const result = (await octokit.repos.listReleases(args)).data.map((release) => release.id);
+  const result = (await octokit.repos.listReleases(args)).data.map(
+    (release) => release.id
+  );
   await octoCache.setItem(cacheKey, result, {
     ttl: result.length === args.per_page ? 60 * 60 * 24 : 60 * 60,
   });
@@ -57,7 +59,11 @@ const calculateResult = async ({
   let page = 0;
 
   do {
-    const newReleaseIds = await fetchReleaseIDs(octokit, { ...repoConf, per_page: 30, page });
+    const newReleaseIds = await fetchReleaseIDs(octokit, {
+      ...repoConf,
+      per_page: 30,
+      page,
+    });
     if (!newReleaseIds.length) {
       break;
     }
@@ -100,12 +106,19 @@ const calculateResult = async ({
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const octokit = new Octokit({ auth: process.env.GITHUB_PAT });
+  const currentUrl = new URL(`https://releases-count.manjaro-sway.download${req.url}`);
+  if (req.headers['x-forwarded-host']) {
+    currentUrl.host = req.headers['x-forwarded-host'] as string;
+  }
 
   const input = await z
     .object({
       owner: z.string(),
       repo: z.string(),
-      suffixes: z.string().optional().transform((v) => v ? v.split(",") : undefined),
+      suffixes: z
+        .string()
+        .optional()
+        .transform((v) => (v ? v.split(",") : undefined)),
     })
     .safeParseAsync(req.query);
 
@@ -136,5 +149,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     octokit,
     suffixes: input.data.suffixes,
   });
-  res.json({ count: total });
+
+  res.json({
+    count: total,
+    shield:
+      `https://img.shields.io/badge/dynamic/json?color=green&label=manjaro-sway&cache=3600&query=count&url=${encodeURIComponent(currentUrl.toString())}`,
+  });
 }
