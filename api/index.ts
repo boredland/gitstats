@@ -2,11 +2,13 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Octokit } from "@octokit/rest";
 import { CacheContainer } from "node-ts-cache";
-import { MemoryStorage } from "node-ts-cache-storage-memory";
 import { z } from "zod";
+import IoRedis from "ioredis";
+import { IoRedisStorage } from "node-ts-cache-storage-ioredis";
 
-const octoCache = new CacheContainer(new MemoryStorage());
-const resultCache = new CacheContainer(new MemoryStorage());
+const ioRedisInstance = new IoRedis(process.env.REDIS_URI!);
+const octoCache = new CacheContainer(new IoRedisStorage(ioRedisInstance));
+const resultCache = new CacheContainer(new IoRedisStorage(ioRedisInstance));
 
 const numberFormat = new Intl.NumberFormat("en-US");
 
@@ -19,18 +21,18 @@ const fetchReleaseIDs = async (
     page: number | undefined;
   }
 ) => {
-  const fn = octokit.repos.listReleases;
   const cacheKey = JSON.stringify(args);
-  const cachedResult = await octoCache.getItem<ReturnType<typeof fn>>(cacheKey);
+  const cachedResult = await octoCache.getItem<number[]>(cacheKey);
   if (cachedResult) {
     console.debug("octoCache hit!");
     return cachedResult;
   }
 
-  const result = await octokit.repos.listReleases(args);
+  const result = (await octokit.repos.listReleases(args)).data.map((release) => release.id);
   await octoCache.setItem(cacheKey, result, {
-    ttl: result.data.length === args.per_page ? 60 * 60 * 24 : 60 * 60,
+    ttl: result.length === args.per_page ? 60 * 60 * 24 : 60 * 60,
   });
+
   return result;
 };
 
@@ -55,9 +57,7 @@ const calculateResult = async ({
   let page = 0;
 
   do {
-    const newReleaseIds = (
-      await fetchReleaseIDs(octokit, { ...repoConf, per_page: 30, page })
-    ).data.map((release) => release.id);
+    const newReleaseIds = await fetchReleaseIDs(octokit, { ...repoConf, per_page: 30, page });
     if (!newReleaseIds.length) {
       break;
     }
@@ -105,7 +105,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .object({
       owner: z.string(),
       repo: z.string(),
-      suffixes: z.string().transform((v) => v.split(",")),
+      suffixes: z.string().optional().transform((v) => v ? v.split(",") : undefined),
     })
     .safeParseAsync(req.query);
 
