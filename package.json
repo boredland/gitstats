@@ -18,7 +18,7 @@
     "@types/node": "^17.0.43",
     "@vercel/frameworks": "^1.0.1",
     "@vercel/node": "2.2.0",
-    "typescript": "4.7.3",
+    "typescript": "4.7.4",
     "vercel": "^25.1.0"
   }
 }
