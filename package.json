@@ -9,7 +9,7 @@
   "dependencies": {
     "@octokit/auth": "3.0.3",
     "@octokit/rest": "18.12.0",
-    "ioredis": "^5.0.6",
+    "ioredis": "5.1.0",
     "node-ts-cache": "4.4.0",
     "node-ts-cache-storage-ioredis": "^4.4.0",
     "zod": "^3.17.3"
