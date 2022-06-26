@@ -4,6 +4,7 @@ import { Octokit } from "@octokit/rest";
 import { z } from "zod";
 import getCache from "../utils/getCache";
 import github from "../utils/github";
+import getShield from "../utils/getShield";
 
 const octokit = github;
 const octoCache = getCache();
@@ -172,10 +173,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     suffixes: input.data.suffixes,
   });
 
-  res.json({
+  const result = {
     count: total,
-    shield: `https://img.shields.io/badge/dynamic/json?color=green&label=manjaro-sway&cache=3600&query=count&url=${encodeURIComponent(
-      currentUrl.toString()
-    )}`,
+  }
+
+  res.json({
+    ...result,
+    shield: getShield<typeof result>(currentUrl.toString(), 'count', 'manjaro-sway')
   });
 }
