@@ -1,49 +1,44 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Octokit } from "@octokit/rest";
-import { CacheContainer } from "node-ts-cache";
 import { z } from "zod";
-import IoRedis from "ioredis";
-import { IoRedisStorage } from "node-ts-cache-storage-ioredis";
+import getCache from "../utils/getCache";
+import github from "../utils/github";
 
-const ioRedisInstance = new IoRedis(process.env.REDIS_URL!);
-const octoCache = new CacheContainer(new IoRedisStorage(ioRedisInstance));
-const resultCache = new CacheContainer(new IoRedisStorage(ioRedisInstance));
+const octokit = github;
+const octoCache = getCache();
+const resultCache = getCache();
 
 const numberFormat = new Intl.NumberFormat("en-US");
 
-const fetchReleaseIDs = async (
-  octokit: Octokit,
-  args: {
-    owner: string;
-    repo: string;
-    per_page: number;
-    page: number | undefined;
-  }
-) => {
-  const cacheKey = JSON.stringify(args);
+const fetchReleaseIDs = async (args: {
+  owner: string;
+  repo: string;
+  per_page: number;
+  page: number | undefined;
+}) => {
+  const cacheKey = "release_ids_" + JSON.stringify(args);
   const cachedResult = await octoCache.getItem<number[]>(cacheKey);
   if (cachedResult) {
     console.debug("octoCache hit!");
-    return cachedResult;
   }
 
-  const result = (await octokit.repos.listReleases(args)).data.map(
-    (release) => release.id
-  );
-  await octoCache.setItem(cacheKey, result, {
-    ttl: result.length === args.per_page ? 60 * 60 * 24 : 60 * 60,
-  });
+  const result: number[] =
+    cachedResult ??
+    (await octokit.repos.listReleases(args)).data.map((release) => release.id);
+    
+  if (!cachedResult)
+    await octoCache.setItem(cacheKey, result, {
+      ttl: result.length === args.per_page ? 60 * 60 * 24 : 60 * 60,
+    });
 
   return result;
 };
 
 const calculateResult = async ({
-  octokit,
   repoConf,
   suffixes,
 }: {
-  octokit: Octokit;
   repoConf: { owner: string; repo: string };
   suffixes?: string[];
 }) => {
@@ -59,7 +54,7 @@ const calculateResult = async ({
   let page = 0;
 
   do {
-    const newReleaseIds = await fetchReleaseIDs(octokit, {
+    const newReleaseIds = await fetchReleaseIDs({
       ...repoConf,
       per_page: 30,
       page,
@@ -104,11 +99,41 @@ const calculateResult = async ({
   return result;
 };
 
+type GetRepoQuery = {
+  owner: string;
+  repo: string;
+  created_at: string;
+};
+const getRepo = async (args: { owner: string; repo: string }) => {
+  const cacheKey = "repo_" + JSON.stringify(args);
+  const cachedResult = await octoCache.getItem<GetRepoQuery>(cacheKey);
+
+  const result: GetRepoQuery | undefined =
+    cachedResult ??
+    (await octokit.repos
+      .get(args)
+      .then(({ data: { owner, created_at, name } }) => ({
+        owner: owner.login,
+        created_at,
+        repo: name,
+      }))
+      .catch((error) => {
+        console.error(error);
+        return undefined;
+      }));
+
+  if (!cachedResult)
+    await octoCache.setItem(cacheKey, result, {
+      ttl: 60 * 60 * 24,
+    });
+};
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const octokit = new Octokit({ auth: process.env.GITHUB_PAT });
-  const currentUrl = new URL(`https://releases-count.manjaro-sway.download${req.url}`);
-  if (req.headers['x-forwarded-host']) {
-    currentUrl.host = req.headers['x-forwarded-host'] as string;
+  const currentUrl = new URL(
+    `https://releases-count.manjaro-sway.download${req.url}`
+  );
+  if (req.headers["x-forwarded-host"]) {
+    currentUrl.host = req.headers["x-forwarded-host"] as string;
   }
 
   const input = await z
@@ -146,13 +171,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const total = await calculateResult({
     repoConf,
-    octokit,
     suffixes: input.data.suffixes,
   });
 
   res.json({
     count: total,
-    shield:
-      `https://img.shields.io/badge/dynamic/json?color=green&label=manjaro-sway&cache=3600&query=count&url=${encodeURIComponent(currentUrl.toString())}`,
+    shield: `https://img.shields.io/badge/dynamic/json?color=green&label=manjaro-sway&cache=3600&query=count&url=${encodeURIComponent(
+      currentUrl.toString()
+    )}`,
   });
 }
