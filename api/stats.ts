@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { Octokit } from "@octokit/rest";
 import { z } from "zod";
 import getCache from "../utils/getCache";
 import github from "../utils/github";
@@ -9,8 +8,6 @@ import getCurrentUrl from "../utils/getCurrentUrl";
 if (!process.env.GITHUB_PAT) throw new Error("GITHUB_PAT not set");
 
 const octoCache = getCache();
-const resultCache = getCache();
-
 const octokit = github;
 
 type UserQuery = {
@@ -101,6 +98,8 @@ const getRepos = async (username: string, page = 0): Promise<ReposQuery> => {
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  res.setHeader('Content-Type', 'application/json');
+  
   const input = await z
     .object({
       user: z.string(),

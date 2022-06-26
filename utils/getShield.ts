@@ -4,9 +4,9 @@ type Join<K, P> = K extends string | number
     : never
   : never;
 
-type Prev = [never, 0, 1, 2, 3, 4, 5, 6, 7];
+type Prev = [never, 0, 1, 2,3,4];
 
-type Paths<T, D extends number = 10> = [D] extends [never]
+type Paths<T, D extends number = 4> = [D] extends [never]
   ? never
   : T extends object
   ? {

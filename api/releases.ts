@@ -1,6 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { Octokit } from "@octokit/rest";
 import { z } from "zod";
 import getCache from "../utils/getCache";
 import github from "../utils/github";
@@ -131,7 +130,9 @@ const getRepo = async (args: { owner: string; repo: string }) => {
   return result;
 };
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {  
+  res.setHeader('Content-Type', 'application/json');
+
   const input = await z
     .object({
       owner: z.string(),
