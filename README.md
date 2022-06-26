@@ -1,14 +1,14 @@
 
 # releases download count
 
-![downloads](https://img.shields.io/badge/dynamic/json?color=green&label=manjaro-sway&cache=3600&query=count&url=https%3A%2F%2Freleases-count.manjaro-sway.download%2F%3Fowner%3Dmanjaro-sway%26repo%3Dmanjaro-sway%26suffixes%3Diso%2Czip)
+![downloads](https://img.shields.io/badge/dynamic/json?color=green&label=manjaro-sway&cache=3600&query=count&url=https%3A%2F%2Freleases-count.manjaro-sway.download%2Freleases%3Fowner%3Dmanjaro-sway%26repo%3Dmanjaro-sway)
 
 this is a webservice that returns the sum of downloads for all releases of a github repository.
 
 ## Example Request
 
 ```sh
-curl -X GET https://releases-count.manjaro-sway.download/?owner={owner}&repo={repo}&suffixes={suffixes}
+curl -X GET https://releases-count.manjaro-sway.download/releases?owner={owner}&repo={repo}&suffixes={suffixes}
 ```
 
 ### API
