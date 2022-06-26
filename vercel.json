@@ -3,6 +3,10 @@
         {
             "src": "/releases(.*)",
             "dest": "/api/releases.ts"
+        },
+        {
+            "src": "/stats(.*)",
+            "dest": "/api/stats.ts"
         }
     ]
 }
