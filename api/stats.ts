@@ -3,6 +3,8 @@ import { Octokit } from "@octokit/rest";
 import { z } from "zod";
 import getCache from "../utils/getCache";
 import github from "../utils/github";
+import getShield from "../utils/getShield";
+import getCurrentUrl from "../utils/getCurrentUrl";
 
 if (!process.env.GITHUB_PAT) throw new Error("GITHUB_PAT not set");
 
@@ -140,16 +142,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   );
 
-  res.json({
+   const result = {
     name: user.name,
     company: user.company,
     hubbing_since: user.hubbing_since,
     repo_count: repos.length,
     repo_owned_count: repos_counts.owned_count,
-    stargazers: repos_counts.stargazers_count,
+    stargazers_count: repos_counts.stargazers_count,
     forks: repos_counts.forks_count,
     languages: Object.entries(repos_counts.languages)
       .sort((a, b) => b[1] - a[1])
       .map((v) => v[0]),
+  }
+
+  const shields = {
+    repo_count: getShield<typeof result>(getCurrentUrl(req), 'repo_count', 'repos'),
+    forks: getShield<typeof result>(getCurrentUrl(req), 'forks', 'forks'),
+    stargazers_count: getShield<typeof result>(getCurrentUrl(req), 'stargazers_count', 'stars')
+  }
+
+  res.json({
+    ...result,
+    shields
   });
 }

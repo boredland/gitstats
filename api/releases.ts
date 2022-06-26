@@ -5,6 +5,7 @@ import { z } from "zod";
 import getCache from "../utils/getCache";
 import github from "../utils/github";
 import getShield from "../utils/getShield";
+import getCurrentUrl from "../utils/getCurrentUrl";
 
 const octokit = github;
 const octoCache = getCache();
@@ -131,13 +132,6 @@ const getRepo = async (args: { owner: string; repo: string }) => {
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const currentUrl = new URL(
-    `https://releases-count.manjaro-sway.download${req.url}`
-  );
-  if (req.headers["x-forwarded-host"]) {
-    currentUrl.host = req.headers["x-forwarded-host"] as string;
-  }
-
   const input = await z
     .object({
       owner: z.string(),
@@ -179,6 +173,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   res.json({
     ...result,
-    shield: getShield<typeof result>(currentUrl.toString(), 'count', 'manjaro-sway')
+    shield: getShield<typeof result>(getCurrentUrl(req), 'count', 'manjaro-sway')
   });
 }
