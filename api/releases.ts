@@ -42,7 +42,7 @@ const calculateResult = async ({
   repoConf: { owner: string; repo: string };
   suffixes?: string[];
 }) => {
-  const cacheKey = JSON.stringify({ repoConf, suffixes });
+  const cacheKey = 'release_count_' + JSON.stringify({ repoConf, suffixes });
   const cachedResult = await resultCache.getItem<string>(cacheKey);
   if (cachedResult) {
     console.debug("resultCache hit!");
@@ -126,6 +126,7 @@ const getRepo = async (args: { owner: string; repo: string }) => {
     await octoCache.setItem(cacheKey, result, {
       ttl: 60 * 60 * 24,
     });
+  return result;
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -159,10 +160,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     repo: input.data.repo,
   };
 
-  const repoInfo = await octokit.repos.get(repoConf).catch((error) => {
-    res.status(400).json({ error: error.response.data.message });
-    return null;
-  });
+  const repoInfo = await getRepo(repoConf);
 
   if (!repoInfo) return;
 

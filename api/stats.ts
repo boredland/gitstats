@@ -7,6 +7,8 @@ import github from "../utils/github";
 if (!process.env.GITHUB_PAT) throw new Error("GITHUB_PAT not set");
 
 const octoCache = getCache();
+const resultCache = getCache();
+
 const octokit = github;
 
 type UserQuery = {
@@ -15,7 +17,7 @@ type UserQuery = {
   hubbing_since: string;
 };
 const getUser = async (username: string): Promise<UserQuery | undefined> => {
-  const cacheKey = `b${username}_exists`;
+  const cacheKey = `exists_${username}`;
   const cachedResult = await octoCache.getItem<UserQuery>(cacheKey);
   if (cachedResult) {
     console.debug("octoCache hit!");
@@ -52,8 +54,8 @@ type ReposQuery = {
   name: string;
 }[];
 const getRepos = async (username: string, page = 0): Promise<ReposQuery> => {
-  const per_page = 10;
-  const cacheKey = `e${username}_repos_p${page}_pp${per_page}`;
+  const per_page = 50;
+  const cacheKey = `repos_${username}_p${page}_pp${per_page}`;
   const cachedResult = await octoCache.getItem<ReposQuery>(cacheKey);
   if (cachedResult) {
     console.debug("octoCache hit!");
