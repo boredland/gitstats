@@ -5,8 +5,8 @@
             "dest": "/api/releases.ts"
         },
         {
-            "src": "/user(.*)",
-            "dest": "/api/user.ts"
+            "src": "/stats(.*)",
+            "dest": "/api/stats.ts"
         }
     ]
 }
