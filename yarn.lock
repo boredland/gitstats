@@ -399,7 +399,7 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.3.1.tgz#24691fa2b0c3ec8c0d34bfcfd495edac5593ebb4"
   integrity sha512-N87VuQi7HEeRJkhzovao/JviiqKjDKMVKxKMfUvSKw+MbkbW8R0nA3fi/MQhhlxV2fQ+2ReM+/Nt4efdrJx3zA==
 
-"@types/node@^17.0.43":
+"@types/node@17.0.43":
   version "17.0.43"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.43.tgz#7f16898cdd791c9d64069000ad448b47b3ca8353"
   integrity sha512-jnUpgw8fL9kP2iszfIDyBQtw5Mf4/XSqy0Loc1J9pI14ejL83XcCEvSf50Gs/4ET0I9VCCDoOfufQysj0S66xA==
@@ -414,7 +414,7 @@
   resolved "https://registry.yarnpkg.com/@vercel/build-utils/-/build-utils-4.1.1-canary.1.tgz#217498006ce217952dbbb7e4c438e41b5c28243e"
   integrity sha512-9Lp6oNTB3Jl/g1mVorVj0oIzxPRgATdJLuLtXJIvY4WDFJMs+1VMMlxIrtlYo1v9d/5qGJYk1ZXPDu2vKqX8/A==
 
-"@vercel/frameworks@^1.0.1":
+"@vercel/frameworks@1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@vercel/frameworks/-/frameworks-1.0.1.tgz#649432d8d9b52b4f33727686ff25138b8d1b3cdd"
   integrity sha512-bsiIFsdyAPtHIlVV5JLzIsioB10CpLp3PP9ZsE0r1BQwvPx5TcnQc9YI/PMOy1lgQDzdJ8KsmRdcMz0RJBXcVw==
@@ -1993,7 +1993,7 @@ node-pre-gyp@^0.13.0:
     semver "^5.3.0"
     tar "^4"
 
-node-ts-cache-storage-ioredis@^4.4.0:
+node-ts-cache-storage-ioredis@4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/node-ts-cache-storage-ioredis/-/node-ts-cache-storage-ioredis-4.4.0.tgz#e1ba421889e291e3cf45057f6f961b75c18c0e7a"
   integrity sha512-T4LowSB6Stgavp9s6uRokbUyjpjW9xrJLtfythsGbls5+EWrYcl5D3RH1oZpCKPXkxqFl8VJZnmO26geJFqZhA==
@@ -2752,7 +2752,7 @@ util@^0.12.3:
     safe-buffer "^5.1.2"
     which-typed-array "^1.1.2"
 
-vercel@^25.1.0:
+vercel@25.1.0:
   version "25.1.0"
   resolved "https://registry.yarnpkg.com/vercel/-/vercel-25.1.0.tgz#2783f27832b578fcaeb91b124c5e4a69d4db560f"
   integrity sha512-uB/x9Gqljw1s2C5Kn/DCNCypbbaDYvPMuVqb0z73NqXNTDl220Q+F24DnKXp9bWmizbmDhRaEmlTRnxPI4pbBg==
@@ -2876,7 +2876,7 @@ yn@3.1.1:
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
   integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
 
-zod@^3.17.3:
+zod@3.17.3:
   version "3.17.3"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.17.3.tgz#86abbc670ff0063a4588d85a4dcc917d6e4af2ba"
   integrity sha512-4oKP5zvG6GGbMlqBkI5FESOAweldEhSOZ6LI6cG+JzUT7ofj1ZOC0PJudpQOpT1iqOFpYYtX5Pw0+o403y4bcg==
