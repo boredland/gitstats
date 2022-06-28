@@ -414,10 +414,10 @@
   resolved "https://registry.yarnpkg.com/@vercel/build-utils/-/build-utils-4.1.1-canary.1.tgz#217498006ce217952dbbb7e4c438e41b5c28243e"
   integrity sha512-9Lp6oNTB3Jl/g1mVorVj0oIzxPRgATdJLuLtXJIvY4WDFJMs+1VMMlxIrtlYo1v9d/5qGJYk1ZXPDu2vKqX8/A==
 
-"@vercel/frameworks@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@vercel/frameworks/-/frameworks-1.0.1.tgz#649432d8d9b52b4f33727686ff25138b8d1b3cdd"
-  integrity sha512-bsiIFsdyAPtHIlVV5JLzIsioB10CpLp3PP9ZsE0r1BQwvPx5TcnQc9YI/PMOy1lgQDzdJ8KsmRdcMz0RJBXcVw==
+"@vercel/frameworks@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@vercel/frameworks/-/frameworks-1.0.2.tgz#77b10b5138b7f8f907fc5166cf2e3712984f73b4"
+  integrity sha512-obdv8puBDO0CeZjIL2ggyshdDhP/afqhKV8VccXbtA4ikfeGtj3NNORKGWltVUCyjRaMBs3K6x6sic3VF1g7LA==
   dependencies:
     "@iarna/toml" "2.2.3"
     js-yaml "3.13.1"
