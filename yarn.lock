@@ -359,11 +359,6 @@
   resolved "https://registry.yarnpkg.com/@vercel/go/-/go-2.0.2.tgz#188d6d2a44f54a998e1c797cb79130522db98b45"
   integrity sha512-XUDB8Ap8B7rKc/ozBN70Q/O+9FR9KocVsahwBRC4r50Ttinkg7J96vJwvUrW5pz5NPyIhN4aRji/tbw/nIU/pA==
 
-"@vercel/ncc@0.24.0":
-  version "0.24.0"
-  resolved "https://registry.yarnpkg.com/@vercel/ncc/-/ncc-0.24.0.tgz#a2e8783a185caa99b5d8961a57dfc9665de16296"
-  integrity sha512-crqItMcIwCkvdXY/V3/TzrHJQx6nbIaRqE1cOopJhgGX6izvNov40SmD//nS5flfEvdK54YGjwVVq+zG6crjOg==
-
 "@vercel/next@3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@vercel/next/-/next-3.1.0.tgz#bf832a24e70361443a9aecd1ceb754b7d85ed8ef"
@@ -391,26 +386,26 @@
   resolved "https://registry.yarnpkg.com/@vercel/node-bridge/-/node-bridge-3.0.0.tgz#443655b74713ec65531726fb5a30c5c528c804bf"
   integrity sha512-TNQK6cufwrhd8ASDk5YHHenH8Xhp9sY8xUjOTKnQQI37KLk+Sw2HlHhT5rzUFN23ahosUlkY8InwtYUmSNb9kw==
 
-"@vercel/node@2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@vercel/node/-/node-2.3.0.tgz#954408dbbfe437410b360c3e80bbe6a540ef4c6f"
-  integrity sha512-I7CDslDrODUlsF5+pnXtl2FQLlMix/KkBlsNmaoOYpFlWKnANlhJDwpufsJWPP9mvSmobWSLlxRkTVa/GRir9w==
+"@vercel/node@2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@vercel/node/-/node-2.3.1.tgz#8aac20dad46ea304775ac1a9cf155373cfe8a9db"
+  integrity sha512-9hJ55I6o000Wlttm9C+e7lQjtz2fHfJ6t+3h1/XbkKTYkJaGE+iZR3Bif3964ZpysT7cT38G5Jjpl6g11I6H+w==
   dependencies:
     "@types/node" "*"
     "@vercel/build-utils" "4.2.0"
-    "@vercel/ncc" "0.24.0"
     "@vercel/node-bridge" "3.0.0"
     "@vercel/static-config" "2.0.1"
     edge-runtime "1.0.1"
+    esbuild "0.14.47"
     exit-hook "2.2.1"
     node-fetch "2.6.1"
     ts-node "8.9.1"
     typescript "4.3.4"
 
-"@vercel/node@2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@vercel/node/-/node-2.3.1.tgz#8aac20dad46ea304775ac1a9cf155373cfe8a9db"
-  integrity sha512-9hJ55I6o000Wlttm9C+e7lQjtz2fHfJ6t+3h1/XbkKTYkJaGE+iZR3Bif3964ZpysT7cT38G5Jjpl6g11I6H+w==
+"@vercel/node@2.3.2":
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/@vercel/node/-/node-2.3.2.tgz#87630304e6f43ab149010f9e606bd5aca1cca106"
+  integrity sha512-gCh8aEtYOasKGAt2RPa+tFcqO1Rb6fuUeGEgaTaQoKHUl71jIDFzx8T+EWqD67pi7gI686nTm8R/0fCq/weOAg==
   dependencies:
     "@types/node" "*"
     "@vercel/build-utils" "4.2.0"
