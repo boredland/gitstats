@@ -2,7 +2,7 @@ import { IoRedisStorage } from "node-ts-cache-storage-ioredis"
 import IoRedis from "ioredis";
 import { CacheContainer } from "node-ts-cache";
 
-if (!process.env.REDIS_URL) throw new Error("GITHUB_PAT not set");
+if (!process.env.REDIS_URL) throw new Error("REDIS_URL not set");
 
 declare global {
     var __ioredis__: IoRedis;
