@@ -1547,7 +1547,7 @@ node-gyp-build@^4.2.2:
   resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-4.4.0.tgz#42e99687ce87ddeaf3a10b99dc06abc11021f3f4"
   integrity sha512-amJnQCcgtRVw9SvoebO3BKGESClrfXGCUTX9hSn1OuGQTQBOZmVd0Z0OlecpuRksKvbsUqALE8jls/ErClAPuQ==
 
-node-ts-cache-storage-ioredis@^4.4.0:
+node-ts-cache-storage-ioredis@4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/node-ts-cache-storage-ioredis/-/node-ts-cache-storage-ioredis-4.4.0.tgz#e1ba421889e291e3cf45057f6f961b75c18c0e7a"
   integrity sha512-T4LowSB6Stgavp9s6uRokbUyjpjW9xrJLtfythsGbls5+EWrYcl5D3RH1oZpCKPXkxqFl8VJZnmO26geJFqZhA==
@@ -2143,7 +2143,7 @@ yn@3.1.1:
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
   integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
 
-zod@^3.17.3:
+zod@3.17.3:
   version "3.17.3"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.17.3.tgz#86abbc670ff0063a4588d85a4dcc917d6e4af2ba"
   integrity sha512-4oKP5zvG6GGbMlqBkI5FESOAweldEhSOZ6LI6cG+JzUT7ofj1ZOC0PJudpQOpT1iqOFpYYtX5Pw0+o403y4bcg==
