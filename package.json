@@ -11,8 +11,8 @@
     "@octokit/rest": "19.0.3",
     "ioredis": "5.1.0",
     "node-ts-cache": "4.4.0",
-    "node-ts-cache-storage-ioredis": "^4.4.0",
-    "zod": "^3.17.3"
+    "node-ts-cache-storage-ioredis": "4.4.0",
+    "zod": "3.17.3"
   },
   "devDependencies": {
     "@types/node": "^17.0.43",
