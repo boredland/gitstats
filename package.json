@@ -12,7 +12,7 @@
     "ioredis": "5.2.3",
     "node-ts-cache": "4.4.0",
     "node-ts-cache-storage-ioredis": "4.4.0",
-    "zod": "3.18.0"
+    "zod": "3.19.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.43",
