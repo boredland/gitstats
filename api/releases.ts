@@ -1,55 +1,34 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { z } from "zod";
-import getCache from "../utils/getCache";
 import github from "../utils/github";
-import getShield from "../utils/getShield";
-import getCurrentUrl from "../utils/getCurrentUrl";
+import { withCacheFactory, CacheContainer } from '@ioki/node-ts-cache'
+import { IoRedisStorage } from '@ioki/node-ts-cache-storage-ioredis'
+import { Redis } from "ioredis";
+
+const ioredis = new Redis(process.env.REDIS_URL as string)
+const cache = new CacheContainer(new IoRedisStorage(ioredis))
 
 const octokit = github;
-const octoCache = getCache();
-const resultCache = getCache();
 
 const numberFormat = new Intl.NumberFormat("en-US");
 
-const fetchReleaseIDs = async (args: {
+const fetchReleaseIDs = withCacheFactory(cache)(async (args: {
   owner: string;
   repo: string;
   per_page: number;
   page: number | undefined;
 }) => {
-  const cacheKey = "release_ids_" + JSON.stringify(args);
-  const cachedResult = await octoCache.getItem<number[]>(cacheKey);
-  if (cachedResult) {
-    console.debug("octoCache hit!");
-  }
-
-  const result: number[] =
-    cachedResult ??
-    (await octokit.repos.listReleases(args)).data.map((release) => release.id);
-    
-  if (!cachedResult)
-    await octoCache.setItem(cacheKey, result, {
-      ttl: result.length === args.per_page ? 60 * 60 * 24 : 60 * 60,
-    });
-
+  const result: number[] = (await octokit.repos.listReleases(args)).data.map((release) => release.id);
   return result;
-};
+}, { ttl: 120000 });
 
-const calculateResult = async ({
+const calculateResult = withCacheFactory(cache)(async ({
   repoConf,
   suffixes,
 }: {
   repoConf: { owner: string; repo: string };
   suffixes?: string[];
 }) => {
-  const cacheKey = 'release_count_' + JSON.stringify({ repoConf, suffixes });
-  const cachedResult = await resultCache.getItem<string>(cacheKey);
-  if (cachedResult) {
-    console.debug("resultCache hit!");
-    return cachedResult;
-  }
-
   console.debug("calculating...");
   let releaseIds = new Set<number>();
   let page = 0;
@@ -96,64 +75,45 @@ const calculateResult = async ({
 
   console.debug("finished calculating...");
   const result = numberFormat.format(totalDownloads);
-  await resultCache.setItem(cacheKey, result, { ttl: 360 });
   return result;
-};
+}, { ttl: 120000 });
 
 type GetRepoQuery = {
   owner: string;
   repo: string;
   created_at: string;
 };
-const getRepo = async (args: { owner: string; repo: string }) => {
-  const cacheKey = "repo_" + JSON.stringify(args);
-  const cachedResult = await octoCache.getItem<GetRepoQuery>(cacheKey);
+const getRepo = withCacheFactory(cache)(async (args: { owner: string; repo: string }) => {
+  const result: GetRepoQuery | undefined = (await octokit.repos
+    .get(args)
+    .then(({ data: { owner, created_at, name } }) => ({
+      owner: owner.login,
+      created_at,
+      repo: name,
+    }))
+    .catch((error) => {
+      console.error(error);
+      return undefined;
+    }));
 
-  const result: GetRepoQuery | undefined =
-    cachedResult ??
-    (await octokit.repos
-      .get(args)
-      .then(({ data: { owner, created_at, name } }) => ({
-        owner: owner.login,
-        created_at,
-        repo: name,
-      }))
-      .catch((error) => {
-        console.error(error);
-        return undefined;
-      }));
-
-  if (!cachedResult)
-    await octoCache.setItem(cacheKey, result, {
-      ttl: 60 * 60 * 24,
-    });
   return result;
-};
+}, { ttl: 120000 });
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {  
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Content-Type', 'application/json');
-
-  const input = await z
-    .object({
-      owner: z.string(),
-      repo: z.string(),
-      suffixes: z
-        .string()
-        .optional()
-        .transform((v) => (v ? v.split(",") : undefined)),
-    })
-    .safeParseAsync(req.query);
+  const parameters = req.query as { owner: string, repo: string, suffix: string };
+  const input = { ...parameters, suffix: parameters.suffix ? parameters.suffix.split(',') : undefined };
 
   console.debug(input);
 
-  if (!input.success) {
+  if (!input.owner || !input.repo) {
     res.status(400);
-    return res.json(input.error.errors);
+    return res.json({ error: "repo and owner are required"});
   }
 
   const repoConf = {
-    owner: input.data.owner,
-    repo: input.data.repo,
+    owner: input.owner,
+    repo: input.repo,
   };
 
   const repoInfo = await getRepo(repoConf);
@@ -165,15 +125,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const total = await calculateResult({
     repoConf,
-    suffixes: input.data.suffixes,
+    suffixes: input.suffix,
   });
 
   const result = {
     count: total,
   }
 
-  res.json({
-    ...result,
-    shield: getShield<typeof result>(getCurrentUrl(req), 'count', 'manjaro-sway')
-  });
+  res.json(result);
 }
