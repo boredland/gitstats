@@ -10,7 +10,7 @@
     "@ioki/node-ts-cache": "^7.0.1",
     "@ioki/node-ts-cache-storage-ioredis": "^8.0.1",
     "@octokit/auth": "3.0.3",
-    "@octokit/rest": "19.0.11",
+    "@octokit/rest": "19.0.13",
     "ioredis": "^5.2.5",
     "zod": "3.20.6"
   },
