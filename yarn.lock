@@ -2027,10 +2027,10 @@
   resolved "https://registry.yarnpkg.com/@vercel/error-utils/-/error-utils-1.0.10.tgz#6530e9c930d5cf4c7f96045ec3a0bccaf2e6b14c"
   integrity sha512-nsKy2sy+pjUWyKI1V/XXKspVzHMYgSalmj5+EsKWFXZbnNZicqxNtMR94J8Hs7SB4TQxh0s4KhczJtL59AVGMg==
 
-"@vercel/frameworks@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@vercel/frameworks/-/frameworks-1.1.0.tgz#435f02f497568b3723aa89a9a8388d2c9765eb86"
-  integrity sha512-6CqeO/lV+CTQPEUE5+TQJbUQhwX0ZkgXGyABbovdLMDYej8w4YU6/Y3CE+STFw/rHOK7vjZp/5qTU+dO4HRmUA==
+"@vercel/frameworks@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@vercel/frameworks/-/frameworks-2.0.0.tgz#64a8598a8d2c068120b0cdb93660996e9ccd82f8"
+  integrity sha512-C1gZqtoL9wyXowAGmvZMroyxFbaozX9Xv9LnZSreKYhIZg5fDzEyqrrDrYs9bhLZN1/1OBhpsfXsqg6z8cVNCg==
   dependencies:
     "@iarna/toml" "2.2.3"
     js-yaml "3.13.1"
