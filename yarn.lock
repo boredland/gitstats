@@ -535,12 +535,13 @@
   resolved "https://registry.yarnpkg.com/@vercel/error-utils/-/error-utils-2.0.2.tgz#d75ccce100dbdfc9cb85700767b59d4257a91113"
   integrity sha512-Sj0LFafGpYr6pfCqrQ82X6ukRl5qpmVrHM/191kNYFqkkB9YkjlMAj6QcEsvCG259x4QZ7Tya++0AB85NDPbKQ==
 
-"@vercel/frameworks@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@vercel/frameworks/-/frameworks-2.0.0.tgz#64a8598a8d2c068120b0cdb93660996e9ccd82f8"
-  integrity sha512-C1gZqtoL9wyXowAGmvZMroyxFbaozX9Xv9LnZSreKYhIZg5fDzEyqrrDrYs9bhLZN1/1OBhpsfXsqg6z8cVNCg==
+"@vercel/frameworks@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@vercel/frameworks/-/frameworks-3.0.0.tgz#21f9f6773e481f33275c5754a61c363644fc5cb2"
+  integrity sha512-+f/1xAVFEGZQT9tFHxcoukyZbz1+1CXf7PSBl+nhSH+xrnWo0AhcRBYkMoYxgDiSLX5wFgabv187Iu56pkCnVQ==
   dependencies:
     "@iarna/toml" "2.2.3"
+    "@vercel/error-utils" "2.0.2"
     js-yaml "3.13.1"
 
 "@vercel/fun@1.1.0":
